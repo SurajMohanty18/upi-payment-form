@@ -7,11 +7,11 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000; // ✅ Use dynamic port for Railway
 
 // Middleware
 app.use(cors());
-app.use(express.static('public'));
+app.use(express.static('public')); // ✅ Serve static files from public/
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Ensure uploads folder exists
@@ -35,6 +35,12 @@ const upload = multer({ storage });
 const filePath = 'data.xlsx';
 const sheetName = 'Submissions';
 
+// ✅ Serve index.html explicitly at root route
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Submission route
 app.post('/submit', upload.single('screenshot'), (req, res) => {
   try {
     const { name, email, yop } = req.body;
@@ -91,6 +97,7 @@ app.post('/submit', upload.single('screenshot'), (req, res) => {
   }
 });
 
+// Start the server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
